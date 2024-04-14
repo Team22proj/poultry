@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Poultry Dashboard</title>
+    <style>
+        /* Add your CSS styling here */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 0;
+        }
+
+        h1 {
+            background-color: #366438;
+            color: white;
+            text-align: center;
+            padding: 20px;
+        }
+
+        #dashboard {
+            margin: 20px;
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+        }
+
+        h2 {
+            color: #333;
+        }
+        p #alertMessageValue{
+            font-size: medium;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th, td {
+            padding: 10px;
+            text-align: center;
+        }
+
+        th {
+            background-color: #037bc1;
+            color: white;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+
+        #alertMessage {
+            margin-top: 20px;
+            background-color: #ff6347;
+            color: white;
+            padding: 10px;
+            border-radius: 5px;
+            width: 400px; /* Adjust the width as needed */
+            height: auto; /* Allow the height to adjust to content */
+
+        }
+
+        .container {
+            width: 500px; /* Set the width of the box */
+            height: 200px; /* Set the height of the box */
+            background-color: #f0f0f0; /* Set the background color */
+            margin: 0 auto; /* Center the box horizontally */
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+    </style>
+</head>
+<body>
+    <h1>Poultry Dashboard</h1>
+    
+    <div id="dashboard">
+        <h2>Daily Egg Count Tracker</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Cage Number</th>
+                    <th>Egg Count (Day 1)</th>
+                    <th>Egg Count (Day 2)</th>
+                    <th>Egg Count (Day 3)</th>
+                    <th>Egg Count (Day 4)</th>
+                </tr>
+            </thead>
+            <tbody id="calendarBody">
+                <!-- Calendar data will be generated here -->
+            </tbody>
+        </table>
+    </div>
+    
+    <div class="container">
+        <div id="alertMessage">
+            <h2>Alert Message</h2>
+            <p id="alertMessageValue">No Defective cages found!</p>
+        </div>
+    </div>
+    
+
+    <!-- <button onclick="updateDashboard()">Update Dashboard</button> -->
+
+    <script>
+        
+        // Function to generate a random egg count between a specified range
+        function getRandomEggCount(min, max) {
+            return Math.floor(Math.random() * (max - min + 1)) + min;
+        }
+
+        // Function to generate random egg counts for four consecutive days
+        function generateRandomEggCounts() {
+            const randomEggCounts = [];
+            for (let i = 0; i < 4; i++) {
+                randomEggCounts.push(getRandomEggCount(6, 8)); // Change the range as needed
+            }
+            return randomEggCounts;
+        }
+
+        // Function to check if egg count decreases for consecutive days
+        let capturedMessage;
+        function checkDecreasingEggCount(eggCounts) {
+            for (let i = 1; i < eggCounts.length; i++) {
+                if (eggCounts[i] >= eggCounts[i+1]) {
+                    return false;
+                }
+            }
+            return true;
+        }
+        
+        // Function to update the table with consecutive four days egg counts and show alerts
+        function updateTable() {
+            const calendarBody = document.getElementById("calendarBody");
+            calendarBody.innerHTML = ""; // Clear previous data
+
+            const cages = Array.from({ length: 10 }, (_, i) => `Cage ${i + 1}`); // Generate cage numbers
+
+            for (const cage of cages) {
+                const row = document.createElement("tr");
+                const dateCell = document.createElement("td");
+                const cageCell = document.createElement("td");
+                const eggCounts = generateRandomEggCounts(); // Generate random egg counts for four days
+                const currentDate = new Date();
+
+                dateCell.textContent = currentDate.toLocaleDateString();
+                 // Replace with actual date if needed
+                cageCell.textContent = cage;
+
+                row.appendChild(dateCell);
+                row.appendChild(cageCell);
+
+                for (const count of eggCounts) {
+                    const eggCountCell = document.createElement("td");
+                    eggCountCell.textContent = count;
+                    row.appendChild(eggCountCell);
+                }
+
+                calendarBody.appendChild(row);
+
+                // Check if egg count decreases for consecutive days
+                const isDecreasing = checkDecreasingEggCount(eggCounts);
+
+                if (isDecreasing) {
+                    // If egg count decreases, show an alert message
+                    document.getElementById("alertMessageValue").textContent = `Alert: Egg count decreased for ${cage}`;
+                    capturedMessage=document.getElementById("alertMessageValue").textContent;
+                    sendAlertAsSMS();
+                }
+                
+            }
+
+        }
+
+        // Function to update the entire dashboard
+        function updateDashboard() {
+            updateTable();
+        }
+        // Initialize the dashboard on page load
+        updateDashboard();
+
+        // function checkAndSendAlert() {
+        //     const eggCountDecreased = checkDecreasingEggCount(eggCounts);
+        //     // const eggCountDecreased = true; // Replace with your condition to check if the egg count decreased
+
+        //     if (eggCountDecreased) {
+        //         sendAlertAsSMS();
+        //     }
+        // }
+
+        // // Trigger the checkAndSendAlert function every 12 hours (12 * 60 * 60 * 1000 milliseconds)
+        // setInterval(checkAndSendAlert, 12 * 60 * 60 * 1000); // 12 hours
+        
+
+        //Send Alert message to farmer
+       
+        function sendAlertAsSMS() {
+            const alertMessage = capturedMessage;
+            const phoneNumber = '+918637674580'; // Replace with the recipient's phone number
+
+            // Your Twilio credentials and phone number
+            const accountSid = 'AC4f3cae694ad2c452429584f1443955dc';
+            const authToken = '60046e99fd0967fd9454faeebaa6d4f5';
+            const twilioPhoneNumber = '+12568417112';
+
+            // Construct the Twilio API URL
+            const url = `https://api.twilio.com/2010-04-01/Accounts/${accountSid}/Messages.json`;
+
+            // Set up the request headers
+            const headers = new Headers({
+                'Authorization': 'Basic ' + btoa(`${accountSid}:${authToken}`),
+                'Content-Type': 'application/x-www-form-urlencoded',
+            });
+
+            // Set up the request data
+            const data = new URLSearchParams();
+            data.append('To', phoneNumber);
+            data.append('From', twilioPhoneNumber);
+            data.append('Body', alertMessage);
+
+            // Send SMS using Fetch API
+            fetch(url, {
+                method: 'POST',
+                headers: headers,
+                body: data,
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('SMS sent successfully. SID: ' + data.sid);
+            })
+            .catch(error => {
+                console.error('Error sending SMS: ' + error);
+            });
+        }
+
+        // Check for a condition (e.g., egg count decrease) and trigger SMS sending when the condition is met
+        
+    </script>
+</body>
+</html>

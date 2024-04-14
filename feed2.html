@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Poultry Feed Calculator</title>
+<link rel="stylesheet" href="feed2_style.css">
+
+</head>
+<body>
+
+<div class="container">
+    <h2>Poultry Feed Calculator</h2>
+
+    <form id="feedCalculator">
+        <label for="age">Enter Hen's Age (in weeks):</label>
+        <input type="number" id="age" name="age" required>
+        <button type="submit">Calculate</button>
+    </form>
+
+    <div id="results"></div>
+    <br>
+    <div>
+        <a href="index.html" class="back-btn">Back to Index</a>
+    </div>
+</div>
+
+<script>
+document.getElementById("feedCalculator").addEventListener("submit", function(event) {
+    event.preventDefault();
+    var age = parseInt(document.getElementById("age").value);
+    var feedData = calculateFeed(age);
+    displayResults(feedData);
+});
+
+function calculateFeed(age) {
+    // Feed and nutritional requirements based on hen's age
+    var feedType, totalFeedQty, protein, me, calcium, phosphorus, lysine, methionine, alternativeSuggestion;
+
+    if (age >= 20 && age <= 60) {
+        feedType = "Layer Mash";
+        totalFeedQty = "1054.30 g";
+        protein ="17.51"
+        me ="2.62" 
+        calcium = "4.10"
+        phosphorus = "0.41"
+        lysine = "0.76"
+        methionine = "0.39"
+       
+        alternativeSuggestion = "Consider supplementing with additional protein sources like soybean meal.";
+    } else if (age > 60) {
+        feedType = "Layer Mash";
+        totalFeedQty = "1053.50 g";
+        protein ="16.59"
+        me ="2.60" 
+        calcium = "4.44"
+        phosphorus = "0.40"
+        lysine = "0.69"
+        methionine = "0.35"
+        alternativeSuggestion = "Consider supplementing with additional calcium sources like oyster shells.";
+    } else if (age >= 1 && age <= 7) {
+        feedType = "Chick Mash";
+        totalFeedQty = "1054.65 g";
+        protein ="21.10"
+        me ="2.95" 
+        calcium = "0.95"
+        phosphorus = "0.47"
+        lysine = "1.00"
+        methionine = "0.48"
+        alternativeSuggestion = "Consider supplementing with alternative protein sources like fish meal.";
+    } else if (age >= 8 && age <= 17) {
+        feedType = "Grower Cum Developer Mash";
+        totalFeedQty = "1054.30 - 1055.80 g";
+        protein ="19.08"
+        me ="2.86" 
+        calcium = "0.98"
+        phosphorus = "0.45"
+        lysine = "0.85"
+        methionine = "0.45"
+        alternativeSuggestion = "Consider supplementing with additional carb sources like maize or wheat.";
+    } else {
+        feedType = "Unknown";
+        totalFeedQty = "Unknown";
+        protein = "Unknown";
+        carbs = "Unknown";
+        fats = "Unknown";
+        vitamins = "Unknown";
+        alternativeSuggestion = "Insufficient data for age category.";
+    }
+
+    return {
+        feedType: feedType,
+        totalFeedQty: totalFeedQty,
+        protein: protein,
+        me: me,
+        calcium: calcium, 
+        phosphorus: phosphorus, 
+        lysine: lysine, 
+        methionine: methionine,
+        alternativeSuggestion: alternativeSuggestion
+    };
+}
+
+function displayResults(feedData) {
+    var resultsDiv = document.getElementById("results");
+    resultsDiv.innerHTML = `
+        <h3>Feed Requirements</h3>
+        <table>
+            <tr>
+                <th>Feed Type</th>
+                <td>${feedData.feedType}</td>
+            </tr>
+            <tr>
+                <th>Total Feed Quantity</th>
+                <td>${feedData.totalFeedQty}</td>
+            </tr>
+        </table>
+        <h3>Nutritional Requirements(%)</h3>
+        <table>
+            <tr>
+                <th>Protein</th>
+                <td>${feedData.protein}</td>
+            </tr>
+            <tr>
+                <th>ME(mcal/kg)</th>
+                <td>${feedData.me}</td>
+            </tr>
+            <tr>
+                <th>Calcium</th>
+                <td>${feedData.calcium}</td>
+            </tr>
+            <tr>
+                <th>A.phosphorus</th>
+                <td>${feedData.phosphorus}</td>
+            </tr>
+            <tr>
+                <th>Dig.Lysine</th>
+                <td>${feedData.lysine}</td>
+            </tr>
+            <tr>
+                <th>Dig.Methionine</th>
+                <td>${feedData.methionine}</td>
+            </tr>
+        </table>
+        <div class="suggestion">
+            <h3>Alternative Suggestions</h3>
+            <p>${feedData.alternativeSuggestion}</p>
+        </div>
+    `;
+}
+</script>
+
+</body>
+</html>
